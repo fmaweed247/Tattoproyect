@@ -1,0 +1,5 @@
+{
+  "name": "Tattoo Artist Management Platform",
+  "description": "A comprehensive platform for tattoo artists to manage appointment consultations and for clients to submit their tattoo ideas. It features a client-facing booking form and a private admin dashboard with a consultation inbox and calendar view.",
+  "requestFramePermissions": []
+}
