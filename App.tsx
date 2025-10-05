@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   User, Mail, Pencil, Image as ImageIcon, Maximize, MapPin, Send,
   Calendar as CalendarIcon, Check, X, ChevronDown, ChevronUp, Briefcase,
-  BookOpen, Eye, UserCog
+  BookOpen, Eye, UserCog, Phone
 } from 'lucide-react';
 
 // --- TYPES ---
@@ -11,6 +11,7 @@ interface Consultation {
   id: number;
   fullName: string;
   email: string;
+  telephone: string;
   idea: string;
   size: string;
   placement: string;
@@ -26,19 +27,19 @@ type View = 'booking' | 'admin';
 
 // --- MOCK DATA ---
 const initialConsultations: Consultation[] = [
-  { id: 1, fullName: 'Elena Rodriguez (Ejemplo)', email: 'elena@example.com', idea: 'Un fénix resurgiendo de las cenizas en acuarela, cubriendo el omóplato derecho.', size: '15cm x 20cm', placement: 'Omóplato derecho', referenceImageName: 'phoenix-concept.jpg', status: 'pending' },
-  { id: 2, fullName: 'Carlos Sanchez (Ejemplo)', email: 'carlos@example.com', idea: 'Brújula de estilo vintage con un mapa del mundo de fondo. Líneas finas y detalladas.', size: '10cm de diámetro', placement: 'Antebrazo', referenceImageName: 'compass-map.png', status: 'pending' },
-  { id: 3, fullName: 'Sofia Vergara (Ejemplo)', email: 'sofia@example.com', idea: 'Una pequeña constelación de Lira en el tobillo. Minimalista.', size: '5cm', placement: 'Tobillo', referenceImageName: null, status: 'pending' },
+  { id: 1, fullName: 'Elena Rodriguez (Ejemplo)', email: 'elena@example.com', telephone: '611223344', idea: 'Un fénix resurgiendo de las cenizas en acuarela, cubriendo el omóplato derecho.', size: '15cm x 20cm', placement: 'Omóplato derecho', referenceImageName: 'phoenix-concept.jpg', status: 'pending' },
+  { id: 2, fullName: 'Carlos Sanchez (Ejemplo)', email: 'carlos@example.com', telephone: '622334455', idea: 'Brújula de estilo vintage con un mapa del mundo de fondo. Líneas finas y detalladas.', size: '10cm de diámetro', placement: 'Antebrazo', referenceImageName: 'compass-map.png', status: 'pending' },
+  { id: 3, fullName: 'Sofia Vergara (Ejemplo)', email: 'sofia@example.com', telephone: '633445566', idea: 'Una pequeña constelación de Lira en el tobillo. Minimalista.', size: '5cm', placement: 'Tobillo', referenceImageName: null, status: 'pending' },
 ];
 
 const initialAppointments: ApprovedAppointment[] = [
     {
-        id: 4, fullName: 'Marco Diaz', email: 'marco@example.com', idea: 'Serpiente enrollada en una daga', size: '18cm', placement: 'Antebrazo',
+        id: 4, fullName: 'Marco Diaz', email: 'marco@example.com', telephone: '644556677', idea: 'Serpiente enrollada en una daga', size: '18cm', placement: 'Antebrazo',
         referenceImageName: 'snake-dagger.jpg', status: 'approved',
         date: new Date(new Date().setDate(new Date().getDate() + 3)).toISOString().split('T')[0]
     },
     {
-        id: 5, fullName: 'Laura Fernandez', email: 'laura@example.com', idea: 'Retrato de mascota (gato)', size: '12cm', placement: 'Pantorrilla',
+        id: 5, fullName: 'Laura Fernandez', email: 'laura@example.com', telephone: '655667788', idea: 'Retrato de mascota (gato)', size: '12cm', placement: 'Pantorrilla',
         referenceImageName: 'cat-portrait.jpg', status: 'approved',
         date: new Date(new Date().setDate(new Date().getDate() + 10)).toISOString().split('T')[0]
     }
@@ -97,6 +98,7 @@ const BookingForm: React.FC = () => {
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
+        telephone: '',
         idea: '',
         size: '',
         placement: '',
@@ -121,7 +123,7 @@ const BookingForm: React.FC = () => {
     };
     
     const resetForm = () => {
-        setFormData({ fullName: '', email: '', idea: '', size: '', placement: '' });
+        setFormData({ fullName: '', email: '', telephone: '', idea: '', size: '', placement: '' });
         setReferenceFile(null);
         const fileInput = document.getElementById('file-upload') as HTMLInputElement;
         if(fileInput) fileInput.value = '';
@@ -176,7 +178,10 @@ const BookingForm: React.FC = () => {
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 <InputField icon={User} name="fullName" type="text" placeholder="Nombre Completo" value={formData.fullName} onChange={handleInputChange} required />
-                <InputField icon={Mail} name="email" type="email" placeholder="Email" value={formData.email} onChange={handleInputChange} required />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <InputField icon={Mail} name="email" type="email" placeholder="Email" value={formData.email} onChange={handleInputChange} required />
+                    <InputField icon={Phone} name="telephone" type="tel" placeholder="Teléfono" value={formData.telephone} onChange={handleInputChange} required />
+                </div>
                 <TextareaField icon={Pencil} name="idea" placeholder="Describe tu idea detalladamente..." value={formData.idea} onChange={handleInputChange} required />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <InputField icon={Maximize} name="size" type="text" placeholder="Tamaño aproximado (cm)" value={formData.size} onChange={handleInputChange} required />
@@ -233,6 +238,7 @@ const ConsultationItem: React.FC<{
             {isExpanded && (
                 <div className="border-t border-dark-border p-4 space-y-3 text-sm">
                     <p><strong className="text-dark-text-secondary">Email:</strong> {consultation.email}</p>
+                    <p><strong className="text-dark-text-secondary">Teléfono:</strong> {consultation.telephone}</p>
                     <p><strong className="text-dark-text-secondary">Idea Completa:</strong> {consultation.idea}</p>
                     <p><strong className="text-dark-text-secondary">Tamaño:</strong> {consultation.size}</p>
                     <p><strong className="text-dark-text-secondary">Ubicación:</strong> {consultation.placement}</p>
@@ -375,6 +381,7 @@ const AdminDashboard: React.FC = () => {
                         <div className="space-y-2 text-dark-text-primary">
                             <p><strong className="text-dark-text-secondary">Cliente:</strong> {selectedAppointment.fullName}</p>
                             <p><strong className="text-dark-text-secondary">Email:</strong> {selectedAppointment.email}</p>
+                            <p><strong className="text-dark-text-secondary">Teléfono:</strong> {selectedAppointment.telephone}</p>
                             <p><strong className="text-dark-text-secondary">Fecha:</strong> {new Date(selectedAppointment.date).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}</p>
                             <p><strong className="text-dark-text-secondary">Idea:</strong> {selectedAppointment.idea}</p>
                             <p><strong className="text-dark-text-secondary">Tamaño:</strong> {selectedAppointment.size}</p>
