@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   User, Mail, Pencil, Image as ImageIcon, Maximize, MapPin, Send,
@@ -140,18 +139,20 @@ const BookingForm: React.FC = () => {
         setStatus('loading');
         setErrorMessage('');
 
-        const submissionData = {
-            ...formData,
-            referenceImageName: referenceFile?.name || null,
-        };
+        const submissionFormData = new FormData();
+        Object.entries(formData).forEach(([key, value]) => {
+            submissionFormData.append(key, value);
+        });
+
+        if (referenceFile) {
+            submissionFormData.append('referenceImage', referenceFile, referenceFile.name);
+        }
 
         try {
             const response = await fetch('https://n8n.iswstudioweb.com/webhook/1844fc2e-7878-4e7c-a5fa-c1c12b3147ea', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(submissionData),
+                // Do not set Content-Type header; the browser does it automatically for FormData
+                body: submissionFormData,
             });
 
             if (!response.ok) {
